@@ -1,0 +1,70 @@
+<app-header></app-header>
+<!-- <app-footer></app-footer> -->
+<div class="container">
+    <h1 class="mt-5">My Watchlist</h1>
+    <div *ngFor="let alert of alerts" class="mb-5">
+        <app-nostockdata [alertInfo]="alert.alertInfo" [isTimer]="alert.isTimer"></app-nostockdata>
+    </div>
+    <!-- <app-nostockdata [alertInfo]="alertInfo"></app-nostockdata> -->
+    <!-- <div class="card mb-3">
+        <div class="card-body" style="padding-top: 10px;">
+            <div class="row">
+                <i class="bi bi-x mt-0"></i>
+                <div class="col">
+                    <h2 class="card-title mb-0 mt-0">GOOGL</h2>
+                    <h3 class="card-subtitle mb-2 mt-0 text-muted">Alphabet Inc</h3>
+                </div>
+                <div class="col" [style.color]="stockPrice">
+                    <h2 class="card-title mb-0 mt-0">140.52</h2>
+                    <i class="bi bi-caret-up-fill"></i>
+                    
+                    <h3 style="display: inline;" class="card-title mb-2 mt-0">-2.25 (-1.58%)</h3>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- <app-nostockdata [alertInfo]="alertInfo"></app-nostockdata> -->
+    <!-- <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <i class="bi bi-x mt-0"></i>
+                <div class="col">
+                    <h2 class="card-title mb-0 mt-0">GOOGL</h2>
+                    <h3 class="card-subtitle mb-2 mt-0 text-muted">Alphabet Inc</h3>
+                </div>
+                <div class="col" [style.color]="stockPrice">
+                    <h2 class="card-title mb-0 mt-0">140.52</h2>
+                    <i class="bi bi-caret-down-fill"></i>
+                    <h3 style="display:inline" class="card-title mb-2 mt-0">-2.25 (-1.58%)</h3>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div *ngIf="!dataloaded" class="center-spinner"><mat-spinner [diameter]="50"></mat-spinner></div>
+
+    <div *ngFor="let item of watchlistData" class="card mb-3">
+        <a>
+            <div class="card-body" style="padding-top: 10px; cursor: pointer;">
+                <div class="row">
+                    <div>
+                        <i class="bi bi-x mt-0" style="cursor: pointer; width:20px;" (click)="removeFromWatchlist(item.ticker)"></i>
+                    </div>
+                    <div class="col" (click)="redirectToTicker(item.ticker)">
+                        <h2 class="card-title mb-0 mt-0">{{ item.ticker }}</h2>
+                        <h3 class="card-subtitle mb-2 mt-0 text-muted">{{ item.companyName }}</h3>
+                    </div>
+                    <div class="col" [style.color]="item.change > 0 ? 'green' : 'red'">
+                        <h2 class="card-title mb-0 mt-0">{{ roundof(item.currentPrice)}}</h2>
+                        <i
+                            [ngClass]="{'bi bi-caret-up-fill': item.change > 0, 'bi bi-caret-down-fill': item.change < 0}"></i>
+                        <h3 style="display: inline;" class="card-title mb-2 mt-0">{{ roundof(item.change) }} ({{
+                            roundof(item.changePercent)
+                            }}%)</h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+</div>

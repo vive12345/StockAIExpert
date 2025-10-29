@@ -1,0 +1,144 @@
+<!-- <app-header></app-header>
+<app-footer></app-footer>
+<div class="container mt-5">
+    <h1>My Portfolio</h1>
+    <h2>Money in Wallet: ${{moneyInWallet}}</h2>
+    <div class="card">
+        <div style="font: initial;" class="card-header">
+            <h5>AAPL <span>Apple Inc</span></h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">Quantity: <strong>{{quantity}}</strong></p>
+                    <p class="mb-0">Avg. Cost / Share: <strong>{{avgCost}}</strong></p>
+                    <p class="mb-0">Total Cost: <strong>{{totalCost}}</strong></p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-0">Change: <strong>{{change}}</strong></p>
+                    <p class="mb-0">Current Price: <strong>{{currentPrice}}</strong></p>
+                    <p class="mb-0">Market Value: <strong>{{marketValue}}</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <button type="button" class="btn btn-primary" (click) = "buyStock()">Buy</button>
+            <button type="button" class="btn btn-danger" (click) =  "sellStock()">Sell</button>
+        </div>
+    </div>    
+</div>
+<app-nostockdata [alertInfo]=alertInfo></app-nostockdata> -->
+
+<app-header></app-header>
+<div class="container mt-5">
+    <h1>My Portfolio</h1>
+    <div *ngIf="!dataloaded" class="center-spinner"><mat-spinner [diameter]="50"></mat-spinner></div>
+    <div *ngIf="dataloaded">
+        <!-- <h2>Money in Wallet: ${{moneyInWallet - totalMoneySpent}}</h2> -->
+        <h2>Money in Wallet: ${{roundof(finalMoneyInWallet)}}</h2>
+        <div class="mb-5" *ngFor="let alert of alerts">
+            <app-nostockdata [alertInfo]="alert.alertInfo" [isTimer]="alert.isTimer"></app-nostockdata>
+        </div>
+        <!-- <app-nostockdata [alertInfo]="alertInfo"></app-nostockdata> -->
+        <div *ngFor="let item of portfolioData" class="card mb-4"> <!-- Use *ngFor here -->
+            <div class="card-header" (click)="redirectToTicker(item.ticker)" style="cursor: pointer;">
+                <span style="font-weight: normal;" class="me-1 h4">{{item.ticker}}</span><span
+                    class="ms-1 h6 text-secondary">{{item.companyName}}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0 d-flex justify-content-between mb-1">Quantity:
+                            <span class="fw-bold">{{roundof(item.quantity)}}</span>
+                        </p>
+                        <p class="mb-0 d-flex justify-content-between mb-1">Avg. Cost / Share:
+                            <span class="fw-bold">{{roundof(item.totalCost/item.quantity)}}</span>
+                        </p>
+                        <p class="mb-0 d-flex justify-content-between mb-1">Total Cost:
+                            <span class="fw-bold">{{roundof(item.totalCost)}}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+
+
+                        <p class="mb-0 d-flex justify-content-between mb-1">Change: <span
+                                [ngStyle]="{'color': (item.currentPrice - (item.totalCost/item.quantity) > 0) ? 'green' : ((item.currentPrice - (item.totalCost/item.quantity) < 0) ? 'red' : 'black')}"
+                                class="fw-bold"> <i *ngIf="(item.currentPrice - (item.totalCost/item.quantity) > 0)"
+                                    class="bi bi-caret-up-fill"></i> <i
+                                    *ngIf="(item.currentPrice - (item.totalCost/item.quantity) < 0)"
+                                    class="bi bi-caret-down-fill"></i>{{
+                                roundof(item.currentPrice - (item.totalCost/item.quantity) )}}</span>
+                        </p>
+                        <p class="mb-0 d-flex justify-content-between mb-1">Current Price:
+                            <span
+                                [ngStyle]="{'color': (item.currentPrice - (item.totalCost/item.quantity) > 0) ? 'green' : ((item.currentPrice - (item.totalCost/item.quantity) < 0) ? 'red' : 'black')}"
+                                class="fw-bold">{{roundof(item.currentPrice)}}</span>
+                        </p>
+                        <p class="mb-0 d-flex justify-content-between mb-1">Market Value: <span
+                                [ngStyle]="{'color': (item.currentPrice - (item.totalCost/item.quantity) > 0) ? 'green' : ((item.currentPrice - (item.totalCost/item.quantity) < 0) ? 'red' : 'black')}"
+                                class="fw-bold">{{item.quantity
+                                * item.currentPrice | number: '1.2-2'}}</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <button type="button" class="btn btn-primary me-2"
+                    (click)="buyStock(); openBuyModal(BuyContent, item)">Buy</button>
+                <button type="button" class="btn btn-danger"
+                    (click)="sellStock(); openBuyModal(SellContent, item)">Sell</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #BuyContent let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{currentTicker}}</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p>Current Price: {{currentPrice}}<br>
+            Money in Wallet: ${{roundof(finalMoneyInWallet)}}<br>
+            Quatity: <input style="display:inline; width:80%" type="number" class="form-control" id="floatingInput"
+                [(ngModel)]="this.currentQuantity" (ngModelChange)="calculateTotal()" min="0"> </p>
+        <span *ngIf="currentQuantity*currentPrice > moneyInWallet" style="color:red" class="mt-0">Not enough money in
+            wallet</span>
+    </div>
+    <div class="modal-footer buy_sell_modal" style="justify-content: space-between;">
+        <p class="totals mb-0">Total: {{total}}</p>
+        <button type="button" *ngIf="currentAction === 'buy'" class="btn btn-success"
+            (click)="stockBoughtorSold('buy', currentTicker, currentCompanyName, currentQuantity, currentPrice)"
+            [disabled]="(currentQuantity * currentPrice > moneyInWallet) || (currentQuantity == 0)">Buy</button>
+        <!-- <button style="float:right" type="button" *ngIf="currentAction === 'sell'" class="btn btn-success">Sell</button> -->
+
+        <!-- <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button> -->
+    </div>
+</ng-template>
+
+
+<ng-template #SellContent let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{currentTicker}}</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p>Current Price: {{currentPrice}}<br>
+            Money in Wallet: ${{roundof(finalMoneyInWallet)}}<br>
+            Quatity: <input style="display:inline; width:80%" type="number" class="form-control" id="floatingInput"
+                [(ngModel)]="currentQuantity" (ngModelChange)="calculateTotal()" min="0"> </p>
+        <span *ngIf="currentQuantity > quantityEntered" style="color:red" class="mt-0">You cannot sell stocks that you
+            dont have</span>
+    </div>
+    <div class="modal-footer buy_sell_modal" style="justify-content: space-between;">
+        <p class="totals mb-0">Total: {{total}}</p>
+        <!-- <button type="button" *ngIf="currentAction === 'buy'" class="btn btn-success" [disabled]="(quantity * currentPrice > moneyInWallet) || (quantity == 0)">Buy</button> -->
+        <button style="float:right" type="button" class="btn btn-success"
+            (click)="stockBoughtorSold('sell', currentTicker, currentCompanyName, currentQuantity, currentPrice)"
+            [disabled]="(quantityEntered < currentQuantity)">Sell</button>
+        <!-- <button style="float:right" type="button" *ngIf="currentAction === 'sell'" class="btn btn-success">Sell</button> -->
+
+        <!-- <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button> -->
+    </div>
+</ng-template>
+
+<!-- <app-footer></app-footer> -->

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- <html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head> -->
+
+  <nav class="navbar navbar-expand-lg align-items-center">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Stock Search</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="border: 0.5px solid white ;">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav navbar-right right_navigation_bar">
+          <li class="nav-item">
+            <a class="nav-link text-white right_navbar_search" [routerLink]="['/search/home']"
+              routerLinkActive="router-link-active" [class.router-link-active]="activeLink()">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" [routerLink]="['/watchlist']"
+              routerLinkActive="router-link-active">Watchlist</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" [routerLink]="['/portfolio']"
+              routerLinkActive="router-link-active">Portfolio</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+<!-- 
+</html> -->
